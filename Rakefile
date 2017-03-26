@@ -17,8 +17,8 @@ Juwelier::Tasks.new do |gem|
   gem.name = "debilinguifier"
   gem.homepage = "http://github.com/apapamichalis/debilinguifier"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{A [greek, latin] debilinguifier}
+  gem.description = %Q{The purpose of this gem is to return a phrase written using two charsets due to user's mistake. The reason behind this is that we have a db we want to migrate populated with such entries and we want to somehow sanitize it. The db contains company and product names in capital letters (e.g. the user might have written "komπολοι".upcase instead of "κομπολοι".upcase", resulting in a string that in capital letters seems to be the same, but in practice is not)}
   gem.email = "dimxer@hotmail.com"
   gem.authors = ["apapamichalis"]
 

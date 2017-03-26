@@ -47,3 +47,6 @@ pkg
 
 # For rubinius:
 #*.rbc
+
+# My notes file:
+tmp.rb

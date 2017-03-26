@@ -1,0 +1,29 @@
+# test case 1a
+αγρος:    αγρος
+ο αγρος:  ο αγρος
+ο.αγρος:  ο.αγρος
+
+
+# test case 1b
+force:      force
+the force:  the force
+the& force: the& force
+
+
+# test case 2
+enepγεια:    ενεργεια
+h enepγεια:  η ενεργεια
+η ενεργεia:  η ενεργεια
+η&ενεργεia.: η&ενεργεια.
+
+
+# test case 3
+ροwer:        power
+τηε ροwer:    the power
+the ροwer:    the power
+"&τηε.ροwer": "&the.power"
+
+# test case 4
+cψ:                                      cψ
+ψαλιδi s.α.:                             ψαλιδι s.α.
+yεt another strange τεst.-  sα' & aφοι:  υετ another strange test.-  sa' & αφοι
