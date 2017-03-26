@@ -1,6 +1,23 @@
 = debilinguifier
 
-Description goes here.
+This is a module to help me sanitize an already populated db. The db contains company names and product descriptions in capital letters. Users populating the db had been careless enough to allow both [greek, latin] characters to be used in a single word or phrase, making it difficult to alphabetically sort them or search for them. 
+
+The purpose of this gem is to help me import the data into a new db (for a completely different app) in a more deterministic way.
+
+
+* Ruby version 2.4.0 is the minimum required due to [String supports Unicode case mappings] https://www.ruby-lang.org/en/news/2016/12/25/ruby-2-4-0-released/
+
+* To use this gem, just add it (require 'debilinguifier') and call:  DeBiLinguifier.dbl(your_string_to_de-bi-linguified)
+
+* Please note that this only works with capital and detoned characters. 
+
+
+
+This is my very first gem and I used Juwelier https://github.com/flajann2/juwelier to create it.
+
+
+
+
 
 == Contributing to debilinguifier
  

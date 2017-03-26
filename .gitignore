@@ -50,3 +50,4 @@ pkg
 
 # My notes file:
 tmp.rb
+./tmp/*
