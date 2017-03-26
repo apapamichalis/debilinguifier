@@ -27,6 +27,7 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "debilinguifier.gemspec",
     "lib/debilinguifier.rb",
     "spec/debilinguifier_spec.rb",
     "spec/fixtures/examples.yml",
