@@ -1,25 +1,53 @@
 = debilinguifier
 
+<em>Keep in mind that this</em> <b>only</b> <em>works with uppercase characters. For clarity and better readbility, due to the nature of what we are trying to accomplish, most of the examples are in lowercase. Always consider the uppercase equivalent of any such string (in ruby terms: </em> <tt>string.upcase</tt> <em>)</em>
+
+=== Explanation (The short version): 
 This is a module to help me sanitize an already populated db. The db contains company names and product descriptions in capital letters. Users populating the db had been careless enough to allow both [greek, latin] characters to be used in a single word or phrase, making it difficult to alphabetically sort them or search for them. 
 
 The purpose of this gem is to help me import the data into a new db (for a completely different app) in a more deterministic way.
 
+=== Explanation (The long version):
 
-* Ruby version 2.4.0 is the minimum required due to [String supports Unicode case mappings] https://www.ruby-lang.org/en/news/2016/12/25/ruby-2-4-0-released/
+debilinguifier (in greek: αποδιγλωσσοποιητής): A word that does not exist in neither english or greek and attempts to describe the following behaviour:
+
+Latin and greek capital letters have confused the users of an existing system, by their identical looks. The users have -over the years- manually populated a database with entries, which are lacking consistency due to those looks. By convention, only capital letters are used in the system, and as a result, one can find entries as the following (please consider the following in uppercase!): αlpha, vιτα, γama and so on. In every one of these cases we have come across, the solution is relatively simple: 
+1. The phrase (or word) is already written in greek-only or latin-only characters. In this case return it as-is.
+2. The phrase (or word) is written using characters from both charsets, but can be written using only one (or even both) charsets. In this case, replace the similar looking characters and return the result (for example if it contains characters like 'Φ' XOR 'C', which have no equivalent in the other charset but the rest of the characters are common looking in both charsets, return it in the 'correct' charset. If it can be returned in both charsets (eg. αυto), return it in greek charset (in this example αυτο). <em>This is actually cases 2 and 3 in our code.</em> And here comes the tricky part (there was no such example in our case, but "what if...?"!):
+3. The word (or phrase) contains characters from both charsets, that have no equivalent in the other charset (eg. contains both 'Ψ' and 'C'). If it a single phrase like 'cv φωta' there is no real problem: you simply split the phrase, apply the above rules to each word and end up with 'cv φωτα'. And everybody is happy. 
+4. But what if a word is like 'c3ψima'? What kind of query would end up finding this entry in the db? (By the way, the whole idea is that queries will be executed in an AJAX way). The solution was to make our dbl(abbr. for de-bi-linguifier) return it using a bias, which by default is 'greek': it will return 'c3ψιμα'. (You can also choose to use a 'latin' bias, or set it to anything other than that to return the initial word as-is). <em> 3 and 4 correspond to case 4 in our code.</em>
+
+<em>As you may have figured out, the 4th case above attempts to solve a problem that currently does not exist and although it (probably) does not fail miserably, it is outside the scope of our specifications. As such, it only attempts to provide a possible solution for a problem that will probably never appear: it is nearly impossible to find a reason to write a word using simultaneously characters from both charsets on purpose. In any case, if such a problem comes up and the implemented solution is not satisfying, we will revise the code. </em>
+
+The above 4 cases do not correspond to the 4 cases in the module
+
+What we are accomplishing: we can now search in our new db for something that looked like 'ATIMA', but was written as 'aτιμa'.upcase. To be able to succefully query the db we have to check a couple of things before each query:
+* If the phrase can be written in both greek and latin charsets (in other words, can_write_only_greek?(input) AND can_write_only_latin?(input) returns true); then the query must be a union of the results of two subqueries: one with the result of return_in_greek(input) and one with the result of return_in_latin(input). 
+* If the phrase can be written in only one of the two charsets (in other words, can_write_only_greek?(input) XOR can_write_only_latin?(input) returns true); just run through dbl the phrase (just in case the user is using mixed charset) and you are good to go with your query.
+* If the phrase cannot be written with a single charset (in other words can_write_only_greek?(input) OR can_write_only_latin?(input) returns false): Run the phrase through dbl with the same bias as the one used when importing the data!
+
+<em>(Note to myself: I will implement the above functionality in a method later on, when it will be needed. For the time being, I have only documented how this will be done)</em>
+
+---
+=== Notes:
+
+* Ruby version 2.4.0 is the minimum required due to: {String supports Unicode case mappings}[https://bugs.ruby-lang.org/issues/10085] found in {Ruby 2.4.0 release announcement}[https://www.ruby-lang.org/en/news/2016/12/25/ruby-2-4-0-released/]
 
 * To use this gem, just add it (require 'debilinguifier') and call:  DeBiLinguifier.dbl(your_string_to_de-bi-linguified)
-
 * Please note that this only works with capital and detoned characters. 
+* This is my very first gem and I am very proud of it! 
+* I used {Juwelier}[https://github.com/flajann2/juwelier] to create it.
+
+---
+
+To install it, just run: <tt>gem install debilinguifier</tt>
+
+To add it to your project: <tt>require 'debilinguifier'</tt>
+
+To use it: <tt>DeBiLinguifier.dbl(<em>your_string</em>)</tt> <em>It will return you the dbl'ed string</em>
 
 
-
-This is my very first gem and I used Juwelier https://github.com/flajann2/juwelier to create it.
-
-
-
-
-
-== Contributing to debilinguifier
+=== Contributing to debilinguifier
  
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.

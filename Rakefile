@@ -11,6 +11,8 @@ rescue Bundler::BundlerError => e
 end
 require 'rake'
 
+
+
 require 'juwelier'
 Juwelier::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://guides.rubygems.org/specification-reference/ for more options
@@ -18,9 +20,11 @@ Juwelier::Tasks.new do |gem|
   gem.homepage = "http://github.com/apapamichalis/debilinguifier"
   gem.license = "MIT"
   gem.summary = %Q{A [greek, latin] debilinguifier}
-  gem.description = %Q{The purpose of this gem is to return a phrase written using two charsets due to user's mistake. The reason behind this is that we have a db we want to migrate populated with such entries and we want to somehow sanitize it. The db contains company and product names in capital letters (e.g. the user might have written "komπολοι".upcase instead of "κομπολοι".upcase", resulting in a string that in capital letters seems to be the same, but in practice is not)}
+  gem.description = %Q{The purpose of this gem is to return a phrase written using two charsets [greek, latin] (uppercase characters only) due to user's mistake.}
   gem.email = "dimxer@hotmail.com"
   gem.authors = ["apapamichalis"]
+  # This gem will work with 1.8.6 or greater...
+  gem.required_ruby_version = '>= 2.4.0'
 
   # dependencies defined in Gemfile
 end

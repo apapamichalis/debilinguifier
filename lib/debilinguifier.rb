@@ -15,6 +15,7 @@ module DeBiLinguifier
   GREEK_ALPHABET_PLUS_SYMBOLS = Regexp.new("(^[Α-Ω#{SYMBOLS}]+)+$").freeze
   
 
+  ## 
   # Only works with latin and greek charsets.
   # An input phrase can only be one of five things:
   # 1)      Already only in greek or only in latin charset.
@@ -22,14 +23,19 @@ module DeBiLinguifier
   # 3)      Written in a mixed charset, but can be written with just the latin charset.
   # 4)      Written in a mixed charset, but cannot be written with only one of the [greek, latin] charsets.
   #           In this case we split the phrase into words and apply the above rules to each word seperately.
-  #           If case 4 applies to a single word, there is nothing more we can do for it than return it "as is".
-  # 5)      Written in a mixed charset, but can be written either with just the greek charset or just the latin charset.
+  #           If case 4 applies to a single word, then we have to return it greek-ified or latin-ified.
+  #           This way we will be able to produce SQL queries in a more deterministic way.
+  #           (Actually, when searching for a phrase that has been processed by our dbl before writting to the db,
+  #            we will also have to process through dbl the phrase we are looking for before quering the db).
+  #            
+  # 5)      Written in a mixed charset, but can be written either with just the greek charset or just the latin charset 
+  #         (greek bias is the default and only behavior in this case)
   #
   # Note:   We are deliberately ignoring case 5, as it is of no use at the moment as a separate case. 
   # It is actually the initersection of cases 2 and 3. Using case 2 instead.
   # @params input [String] the string we want to de-bi-linguify (!)
   # @return       [String] the de-bi-linguized string
-  def dbl(input)
+  def dbl(input, bias='greek')
     if(is_greek_only?(input) || is_latin_only?(input)) # Case 1
       input
     elsif(can_write_only_greek?(input))                # Case 2
@@ -37,7 +43,7 @@ module DeBiLinguifier
     elsif(can_write_only_latin?(input))                # Case 3
       return_in_latin(input)
     else                                               # Case 4
-      return_in_mixed_charset(input)
+      return_in_mixed_charset(input, bias)
     end
   end
 
@@ -72,13 +78,21 @@ module DeBiLinguifier
   end
 
   # Return the phrase using both charsets
-  def return_in_mixed_charset(input)
+  def return_in_mixed_charset(input, bias)
     # Split the phrase in words and recursively try to return each word in the "correct" charset
-    # If that is not possible (e.g. a word contains both "Φ" and "C", return it as it was originally
+    # If that is not possible (e.g. a word contains both "Φ" and "C", the word must either be greek-ified (default) 
+    # or latin-ified. The reason for this is that we will be able to do SQL queries, as long as the word - or phrase
+    # we are looking for has been passed through dbl.
     # We first split the input phrase, based on the SYMBOLS delimiters 
     words_arr = input.split(/(?<=[#{SYMBOLS}])/)
-    if words_arr.length == 1            # If it was only one word, return it.
-      return (words_arr.join.to_s)
+    if words_arr.length == 1            # If it was only one word, return it, according to the bias.
+      if bias == 'greek'
+        return return_in_greek(words_arr.join.to_s)  # If the bias is 'greek', return the word 'greek-ified'
+      elsif bias == 'latin'
+        return return_in_latin(words_arr.join.to_s)  # Else if bias is 'latin' return it 'latinified'.
+      else 
+        return (words_arr.join.to_s)                 # Else return it as-is (not advisable!)
+      end
     else                                # Else apply dbl to each word we got after splitting input
       words_arr2 =[]
       words_arr.each do |word|
